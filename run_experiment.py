@@ -30,42 +30,41 @@ state_dim = env.observation_space.n
 agent = agentfile.Agent(state_dim, action_dim)
 
 observation = env.reset() # representing the current state
-rewards = []
 
-max_reward, max_learning_rate, max_future_discount_factor = 0, 0, 0
-
+aggregated_rewards = {}
+max_reward, max_id = 0, 0
 lr = 0
-for _ in range(10):
-    if lr + 0.1 >= 1:
-        lr = 0.1
-    else:
-        lr += 0.1
+for _ in range(10): # for 10 different values of the learning rate (0.1 to 1 in increments of 0.1)
+    lr = 0.1 if lr + 0.1 >= 1 else lr + 0.1
     agent.learning_rate = lr
-    future_discount_factor = 0
-    for _ in range(10):
-        if future_discount_factor + 0.1 >= 1:
-            future_discount_factor = 0.1
-        else:
-            future_discount_factor += 0.1
-        agent.future_discount_factor = future_discount_factor
-        for i in range (5):
-            total_reward = 0
-            for _ in range(125000): 
+    fdf = 0
+    for _ in range(10): # for 10 different values of the future discount factor (0.1 to 1 in increments of 0.1)
+        rewards = []
+        fdf = 0.1 if fdf + 0.1 >= 1 else fdf + 0.1
+        agent.future_discount_factor = fdf
+        for _ in range(5): # runs
+            total_reward_gained = 0
+            for _ in range(125000): # steps (if this goes to infinity we get the optimal q-table)
                 # env.render()
                 action = agent.act(observation) # your agent here (this takes random actions)
                 observation, reward, done, info = env.step(action)
                 agent.observe(observation, reward, done)
-                total_reward += reward
+
+                total_reward_gained += reward
                 
                 if done:
                     observation = env.reset() 
-            rewards.append(total_reward)
-        print(sum(rewards)/len(rewards), agent.learning_rate, agent.future_discount_factor)
-        if sum(rewards)/len(rewards) > max_reward:
-            max_reward = sum(rewards)/len(rewards)
-            max_learning_rate = agent.learning_rate
-            max_future_discount_factor = agent.future
-            print("changed")
-print(max_reward, max_learning_rate, max_future_discount_factor)
+            rewards.append(total_reward_gained)
+        i = '(' + str(round(lr, 2)) + ', ' + str(round(fdf, 2)) + ')'
+        aggregated_rewards[i] = rewards
+        average_reward = sum(aggregated_rewards[i])/len(aggregated_rewards[i])
+        print(i, average_reward)
+
+        if average_reward > max_reward:
+            max_reward = average_reward
+            max_id = i
+            print("Current best changed to: " + i)
+            
+print(max_reward, max_id)
 env.close()
 
