@@ -43,11 +43,14 @@ for _ in range(10):
     agent.learning_rate = lr
     future_discount_factor = 0
     for _ in range(10):
-        future_discount_factor += 0.1
+        if future_discount_factor + 0.1 >= 1:
+            future_discount_factor = 0.1
+        else:
+            future_discount_factor += 0.1
         agent.future_discount_factor = future_discount_factor
         for i in range (5):
             total_reward = 0
-            for _ in range(20000): 
+            for _ in range(125000): 
                 # env.render()
                 action = agent.act(observation) # your agent here (this takes random actions)
                 observation, reward, done, info = env.step(action)
@@ -61,8 +64,8 @@ for _ in range(10):
         if sum(rewards)/len(rewards) > max_reward:
             max_reward = sum(rewards)/len(rewards)
             max_learning_rate = agent.learning_rate
-            max_future_discount_factor = max_future_discount_factor
+            max_future_discount_factor = agent.future_discount_factor
             print("changed")
-print(max_reward, round(max_learning_rate, 2), round(max_future_discount_factor, 2))
+print(max_reward, max_learning_rate, max_future_discount_factor)
 env.close()
 
