@@ -64,7 +64,7 @@ for _ in range(10):
         if sum(rewards)/len(rewards) > max_reward:
             max_reward = sum(rewards)/len(rewards)
             max_learning_rate = agent.learning_rate
-            max_future_discount_factor = agent.future_discount_factor
+            max_future_discount_factor = agent.future
             print("changed")
 print(max_reward, max_learning_rate, max_future_discount_factor)
 env.close()
