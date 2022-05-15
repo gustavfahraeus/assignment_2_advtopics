@@ -7,8 +7,8 @@ class Agent(object): #Keep the class name!
         self.action_space = action_space
         self.state_space = state_space
 
-        self.learning_rate = 0.8
-        self.future_discount_factor = 0.95
+        self.learning_rate = 0.1
+        self.future_discount_factor = 1
         self.qtable = 0.5*np.ones([self.state_space, self.action_space])
 
         self.epsilon = 0.05
